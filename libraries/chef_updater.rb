@@ -38,6 +38,9 @@ module ChefUpdaterCookbook
       # @!attribute timeout
       # @return [Integer]
       attribute(:timeout, kind_of: [String, Integer], default: 900)
+      # @!attribute use_ips_package
+      # @return [Boolean]
+      attribute(:use_ips_package, default: false)
 
       # @return [String]
       def remote_source
@@ -72,7 +75,11 @@ module ChefUpdaterCookbook
           "#{arch}.deb"
         elsif platform_family?('solaris2')
           arch = 'sparc' unless arch == 'i386'
-          "#{arch}.solaris"
+          if use_ips_package
+            "#{arch}.solaris.p5p"            
+          else
+            "#{arch}.solaris"
+          end
         elsif platform_family?('aix')
           "#{arch}.bff"
         elsif platform_family?('windows')
@@ -107,10 +114,12 @@ module ChefUpdaterCookbook
             block { throw :end_client_run_early_due_to_chef_upgrade }
             action :nothing
           end
+          
           package new_resource.package_name do
             action :upgrade
             provider Chef::Provider::Package::Dpkg if platform?('ubuntu')
-            provider Chef::Provider::Package::Solaris if platform?('solaris2')
+            provider Chef::Provider::Package::Ips if platform?('solaris2') && new_resource.use_ips_package
+            provider Chef::Provider::Package::Solaris if platform?('solaris2') && !new_resource.use_ips_package
             source location.path
             version new_resource.package_version
             timeout new_resource.timeout
