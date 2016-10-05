@@ -40,7 +40,7 @@ module ChefUpdaterCookbook
       attribute(:timeout, kind_of: [String, Integer], default: 900)
       # @!attribute use_ips_package
       # @return [Boolean]
-      attribute(:use_ips_package, default: false)
+      attribute(:use_ips_package, kind_of: [TrueClass, FalseClass], default: false)
 
       # @return [String]
       def remote_source
@@ -76,7 +76,7 @@ module ChefUpdaterCookbook
         elsif platform_family?('solaris2')
           arch = 'sparc' unless arch == 'i386'
           if use_ips_package
-            "#{arch}.solaris.p5p"            
+            "#{arch}.solaris.p5p"
           else
             "#{arch}.solaris"
           end
@@ -104,6 +104,7 @@ module ChefUpdaterCookbook
         requested_package_version = new_resource.package_version.split('-').first
         return if chef_version.satisfies?(">= #{requested_package_version}")
         notifying_block do
+          
           location = remote_file new_resource.fancy_basename do
             path ::File.join(Chef::Config[:file_cache_path], new_resource.fancy_basename)
             source new_resource.remote_source
