@@ -129,7 +129,7 @@ module ChefUpdaterCookbook
             # and we haven't set up the "admin file" to make it accept -n for chef.
             bash 'uninstall old chef' do
               code 'yes | pkgrm chef'
-              only_if { 'pkginfo -l chef' }
+              only_if 'pkginfo -l chef'
             end
           end
 
