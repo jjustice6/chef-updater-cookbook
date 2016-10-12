@@ -76,7 +76,7 @@ module ChefUpdaterCookbook
         elsif platform_family?('solaris2')
           arch = 'sparc' unless arch == 'i386'
           if use_ips_package
-            "#{arch}.solaris.p5p"
+            "#{arch}.p5p"
           else
             "#{arch}.solaris"
           end
